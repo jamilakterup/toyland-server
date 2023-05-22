@@ -51,6 +51,8 @@ async function run() {
             const result = await toyCollection.find({}).toArray();
             res.send(result);
         })
+
+        // get specific children
         app.get('/getToys/:id', async (req, res) => {
             const id = req.params.id;
             const query = {_id: new ObjectId(id)}
@@ -58,13 +60,14 @@ async function run() {
             res.send(result);
         })
 
-
+        // get all toys
         app.post('/toys', async (req, res) => {
             const body = req.body;
             const result = await toyCollection.insertOne(body);
             res.send(result);
         });
 
+        // update one
         app.patch('/update/:id', async (req, res) => {
             const id = req.params.id;
             const filter = {_id: new ObjectId(id)};
@@ -85,6 +88,7 @@ async function run() {
             res.send(result);
         });
 
+        // delete one
         app.delete('/toys/:id', async (req, res) => {
             const id = req.params.id;
             const query = {_id: new ObjectId(id)};
@@ -92,6 +96,7 @@ async function run() {
             res.send(result);
         });
 
+        // get data by subcategory
         app.get('/toys/:subcategory', async (req, res) => {
             const subcategory = req.params.subcategory;
             const query = {subcategory: subcategory};
@@ -99,6 +104,8 @@ async function run() {
             res.send(result);
         });
 
+
+        // specific users toy
         app.get('/myToys/:email', async (req, res) => {
             const email = req.params.email;
             const query = {email: email};
@@ -106,6 +113,28 @@ async function run() {
             res.send(result);
         });
 
+
+        // Ascending/Descending Sort
+        app.get("/sortMyToy/:sortName", async (req, res) => {
+            // prettier-ignore
+            try {
+                const sortName = req.params.sortName;
+                let price = {}
+                if (sortName === "ascending") {
+                    price = {price: 1}
+                } else if (sortName === "descending") {
+                    price = {price: -1}
+                }
+                let query = {};
+                if (req.query?.email) {
+                    query = {sellerEmail: req.query?.email};
+                }
+                const result = await toyCollection.find(query).sort(price).toArray();
+                res.send(result);
+            } catch (error) {
+                res.status(500).send({success: false, error: error.message});
+            }
+        });
 
 
 
