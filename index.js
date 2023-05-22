@@ -32,8 +32,29 @@ async function run() {
 
         const toyCollection = client.db('toylandDb').collection('toys');
 
+        const indexKeys = {toyName: 1}
+        const indexOption = {name: "toyName"}
+
+        const result = await toyCollection.createIndex(indexKeys, indexOption)
+
+
+        app.get('/toySearch/:text', async (req, res) => {
+            const searchText = req.params.text;
+            const result = await toyCollection.find({
+                toyName: {$regex: searchText, $options: "i"}
+            }).toArray();
+            res.send(result);
+        })
+
+
         app.get('/toys', async (req, res) => {
             const result = await toyCollection.find({}).toArray();
+            res.send(result);
+        })
+        app.get('/getToys/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = {_id: new ObjectId(id)}
+            const result = await toyCollection.find(query).toArray();
             res.send(result);
         })
 
@@ -41,6 +62,26 @@ async function run() {
         app.post('/toys', async (req, res) => {
             const body = req.body;
             const result = await toyCollection.insertOne(body);
+            res.send(result);
+        });
+
+        app.patch('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const filter = {_id: new ObjectId(id)};
+            const body = req.body;
+            const updateDoc = {
+                $set: {
+                    subcategory: body.subcategory,
+                    toyName: body.toyName,
+                    price: body.price,
+                    ratings: body.ratings,
+                    img: body.img,
+                    availableQuantity: body.availableQuantity,
+                    description: body.description,
+                    seller: body.seller
+                }
+            }
+            const result = await toyCollection.updateOne(filter, updateDoc)
             res.send(result);
         });
 
@@ -64,7 +105,6 @@ async function run() {
             const result = await toyCollection.find(query).toArray();
             res.send(result);
         });
-
 
 
 
