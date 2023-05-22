@@ -11,10 +11,6 @@ app.use(cors());
 
 
 
-// const uri = 'mongodb://0.0.0.0:27017';
-
-
-
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.4rd33vy.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -142,10 +138,6 @@ async function run() {
     }
 }
 run().catch(console.dir);
-
-
-
-
 
 
 
